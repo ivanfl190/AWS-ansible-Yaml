@@ -83,7 +83,7 @@
            wait_timeout: 500
            tags:
              name: webserver
-         register: prec2 
+         register: preec2 
            
 
 
