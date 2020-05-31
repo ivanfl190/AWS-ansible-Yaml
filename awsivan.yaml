@@ -1,0 +1,89 @@
+   - name: Iniciando
+     hosts: localhost
+     gather_facts: false
+     vars:  
+     
+       - profile: aws-educate
+       - user: ivan
+       - group: unit
+       - regiao: us-east-1
+     tasks:
+       - name: Criando VPC em AWS
+         ec2_vpc_net:
+           name: Redeslab
+           cidr_block: 10.10.0.0/16
+           profile: "{{ profile }}"
+           region: "{{ regiao }}"
+         register: vpcl
+       - name: Criando Subnet
+         ec2_vpc_subnet:
+           profile: "{{ profile }}"
+           region: "{{ regiao }}"
+           vpc_id: "{{ vpcl.vpc.id }}"
+           cidr: 10.10.1.0/24
+           tags:
+             Name: Webserver Subnet
+         register: subwb
+       - name: Criando security group
+         ec2_group: 
+           name: SG-SSH
+           description: Acess SSH
+           profile: "{{ profile }}"
+           vpc_id: "{{ vpcl.vpc.id }}"
+           region: "{{ regiao }}"
+           rules:
+           - proto: tcp
+             from_port: 22
+             to_port: 22
+             cidr_ip: 0.0.0.0/0
+             rule_desc: SSH
+           rules_egress: 
+           - proto: all
+             cidr_ip: 0.0.0.0/0
+         register: secgr
+       - name: Criando chave
+         ec2_key:
+           name: hostsweb
+           region: "{{ regiao }}"
+           profile: "{{ profile }}"
+         register: kpair
+       - name: Preparando provisionando ec2 
+         ec2_vpc_igw:             
+           profile: "{{ profile }}"
+           region: "{{ regiao }}"
+           vpc_id: "{{ vpcl.vpc.id }}"
+         register: vpcigw 
+
+       - name: Adicionando Routing table 
+         ec2_vpc_route_table: 
+           vpc_id: "{{ vpcl.vpc.id }}"
+           region: "{{ regiao }}"
+           profile: "{{ profile }}"
+           subnets:
+             - "{{ subwb.subnet.id }}"
+           routes: 
+             - dest: 0.0.0.0/0
+               gateway_id:  "{{ vpcigw.gateway_id }}"
+         register: rtbl
+
+       - name: Provisionamento EC2
+         ec2_instance: 
+           name: ansibleec2
+           key_name: "{{ kpair.key.name }}"
+           profile: "{{ profile }}"
+           region: "{{ regiao }}"
+           
+           vpc_subnet_id: "{{ subwb.subnet.id }}"
+           instance_type: t2.micro
+           image_id: ami-0323c3dd2da7fb37d
+           security_group: "{{ secgr.group_id }}"
+           network: 
+             assign_public_ip: true
+           wait: true 
+           wait_timeout: 500
+           tags:
+             name: webserver
+         register: prec2 
+           
+
+
