@@ -2,7 +2,6 @@
      hosts: localhost
      gather_facts: false
      vars:  
-     
        - profile: aws-educate
        - user: ivan
        - group: unit
