@@ -1,6 +1,6 @@
    - name: Iniciando
      hosts: localhost
-     gather_facts: false
+     gather_facts: no
      vars:  
        - profile: aws-educate
        - user: ivan
