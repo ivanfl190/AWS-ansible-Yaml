@@ -23,7 +23,7 @@ Definiçao de qual usuario será, qual grupo  e qual  regiao do AWS a maquina se
 onde o profile que se refere, é o profile do CLI do AWS.
 
 
-   vars:  
+     vars:  
        - profile: Default
        - user: ansible
        - group: ansible
@@ -33,8 +33,8 @@ onde o profile que se refere, é o profile do CLI do AWS.
 Criando uma vpc na AWS , onde irá adicionar a faixa de ip acima, e adicionando o profile que foi definido no escopo vars. O register ,e uma variavel que armazena tudo o que foi criado nas linhas anteriores.
 
 
- tasks:
-       - name: Criando VPC em AWS
+    tasks:
+     - name: Criando VPC em AWS
          ec2_vpc_net:
            name: ansiblelab
            cidr_block: 10.10.0.0/16
@@ -46,8 +46,8 @@ Criando uma vpc na AWS , onde irá adicionar a faixa de ip acima, e adicionando 
 
 Em seguida é criado a  subnet, que será registrado como subwb e terá a tag de Webserver subnet, para identificar. Em vpc_id, será adicionando o register anterior.
  
- - name: Criando Subnet
-         ec2_vpc_subnet:
+    - name: Criando Subnet
+          ec2_vpc_subnet:
            profile: "{{ profile }}"
            region: "{{ regiao }}"
            vpc_id: "{{ vpcl.vpc.id }}"
@@ -58,7 +58,7 @@ Em seguida é criado a  subnet, que será registrado como subwb e terá a tag de
 
 Ao criar o security group , ele será registrado pra porta 22 , o qual será liberado pra SSH, com qualquer IP. 
 
-- name: Criando security group
+    - name: Criando security group
          ec2_group: 
            name: SG-SSH
            description: Acess SSH
@@ -79,7 +79,7 @@ Ao criar o security group , ele será registrado pra porta 22 , o qual será lib
 Criando a chave de acesso, com isso o conteúdo do copy irá criar a chave e move la para a pasta onde o playbook esta sendo executado.
 
 
- - name: Criando chave
+    - name: Criando chave
          ec2_key:
            name: hostsweb
            region: "{{ regiao }}"
@@ -94,7 +94,7 @@ Criando a chave de acesso, com isso o conteúdo do copy irá criar a chave e mov
 
 Aqui começará o processo de provisionamento do ec2, ciando o internet gateway e adicionando  a routing table.
 
-  - name: Preparando provisionando ec2 
+    - name: Preparando provisionando ec2 
          ec2_vpc_igw:             
            profile: "{{ profile }}"
            region: "{{ regiao }}"
@@ -117,7 +117,7 @@ Aqui começará o processo de provisionamento do ec2, ciando o internet gateway 
 
 e por fim o provisionamento do ec2 , assim adicionando alguns registros que foram criados anteriormente. Como o keypair, security group e a subnet, mas também adicionando o image ID, o qual foi retirado do próprio AWS, a image ID cujo sistema operacional é Ubuntu Server 18.04 LTS e adicionando o tipo da instancia, nesse cado  t2.micro.
 
-- name: Provisionamento EC2
+    - name: Provisionamento EC2
          ec2_instance: 
            name: ansible_ec2
            key_name: "{{ kpair.key.name }}"
