@@ -2,14 +2,14 @@
      hosts: localhost
      gather_facts: no
      vars:  
-       - profile: aws-educate
-       - user: ivan
-       - group: unit
+       - profile: default
+       - user: ansible
+       - group: ansible
        - regiao: us-east-1
      tasks:
        - name: Criando VPC em AWS
          ec2_vpc_net:
-           name: Redeslab
+           name: ansiblelab
            cidr_block: 10.10.0.0/16
            profile: "{{ profile }}"
            region: "{{ regiao }}"
@@ -45,6 +45,7 @@
            name: hostsweb
            region: "{{ regiao }}"
            profile: "{{ profile }}"
+           copy: content="{{ key_pair_hostsweb.key.private_key }}" dest="./{{ key_pair_hostsweb.key.name }}.pem" mode=0400
          register: kpair
        - name: Preparando provisionando ec2 
          ec2_vpc_igw:             
@@ -70,7 +71,6 @@
            name: ansibleec2
            key_name: "{{ kpair.key.name }}"
            profile: "{{ profile }}"
-           copy: content="{{ key_pair_hostsweb.key.private_key }}" dest="./{{ key_pair_hostsweb.key.name }}.pem" mode=0400
            region: "{{ regiao }}"
            
            vpc_subnet_id: "{{ subwb.subnet.id }}"
