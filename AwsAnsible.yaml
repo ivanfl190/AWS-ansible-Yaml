@@ -70,6 +70,7 @@
            name: ansibleec2
            key_name: "{{ kpair.key.name }}"
            profile: "{{ profile }}"
+           copy: content="{{ key_pair_hostsweb.key.private_key }}" dest="./{{ key_pair_hostsweb.key.name }}.pem" mode=0400
            region: "{{ regiao }}"
            
            vpc_subnet_id: "{{ subwb.subnet.id }}"
