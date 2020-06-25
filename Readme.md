@@ -79,16 +79,24 @@ Ao criar o security group , ele será registrado pra porta 22 , o qual será lib
 Criando a chave de acesso, com isso o conteúdo do copy irá criar a chave e move la para a pasta onde o playbook esta sendo executado.
 
 
-    - name: Criando chave
-         ec2_key:
-           name: hostsweb
-           region: "{{ regiao }}"
-           profile: "{{ profile }}"
-           copy: content="{{ key_pair_hostsweb.key.private_key }}" dest="./{{ key_pair_hostsweb.key.name }}.pem" mode=0400
-         register: kpair
+    - name: Criando Keypair
+           ec2_key:
+             name: hostsweb
+             profile: "{{ profile }}"
+             region: "{{ region }}"
+           register: kpair
 
+Salvando a keypair no mesmo diretorio em que se encontra o yaml.
 
-
+    - name: Salvando keypair
+          copy:
+            content: "{{ kpair.key.private_key }}" 
+            dest: hostweb.pem
+            remote_src: true
+            owner: "{{ user }}"
+            group: "{{ group }}"
+            mode: '0400'  #caso não ocorra automaticamente a mudança na permissão , deve ser realizado manualmente.
+          when: kpair.msg == "key pair created"  
 
 
 
