@@ -40,13 +40,22 @@
            - proto: all
              cidr_ip: 0.0.0.0/0
          register: secgr
-       - name: Criando chave
+       - name: Criando Keypair
          ec2_key:
            name: hostsweb
-           region: "{{ regiao }}"
-           profile: "{{ profile }}"
-           copy: content="{{ key_pair_hostsweb.key.private_key }}" dest="./{{ key_pair_hostsweb.key.name }}.pem" mode=0400
+            profile: "{{ profile }}"
+            region: "{{ region }}"
+          register: keyReg
          register: kpair
+       - name: Salvando keypair
+         copy:
+           content: "{{ keyReg.key.private_key }}" 
+           dest: hostweb.pem
+           remote_src: true
+           owner: "{{ user }}"
+           group: "{{ group }}"
+           mode: '0400' #caso não ocorra automaticamente a mudança na permissão , deve ser realizado manualmente.
+         when: keyReg.msg == "key pair created"  
        - name: Preparando provisionando ec2 
          ec2_vpc_igw:             
            profile: "{{ profile }}"
