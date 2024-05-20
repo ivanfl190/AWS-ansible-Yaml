@@ -83,7 +83,7 @@
            
            vpc_subnet_id: "{{ subwb.subnet.id }}"
            instance_type: t2.micro
-           image_id: ami-0323c3dd2da7fb37d
+           image_id: ami-0bb84b8ffd87024d8 
            security_group: "{{ secgr.group_id }}"
            network: 
              assign_public_ip: true
